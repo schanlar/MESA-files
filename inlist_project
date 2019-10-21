@@ -1,3 +1,4 @@
+! Inlist to evovle an 1.8 Msol Helius star, with solar metallicity, and overshoot mixing.
 
 &star_job
 
