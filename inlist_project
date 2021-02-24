@@ -206,7 +206,7 @@
 
    ! Multiply ``mesh_delta_coeff`` by (Pgas/Ptotal) to this power.
 
-    !mesh_Pgas_div_P_exponent = 0.25 ! default = 0
+    mesh_Pgas_div_P_exponent = 0.25 ! default = 0
 
 
 
