@@ -11,6 +11,46 @@ win_white_on_black_flag = .false.
 !file_extension = 'ps' !png
 
 
+! TRho Profile window 
+!-------------------------------------------------
+TRho_Profile_win_flag = .true.
+
+! window properties
+TRho_Profile_win_width = 6
+TRho_Profile_win_aspect_ratio = 0.75
+
+TRho_Profile_xleft = 0.15
+TRho_Profile_xright = 0.85
+TRho_Profile_ybot = 0.15
+TRho_Profile_ytop = 0.85
+TRho_Profile_txt_scale = 1.0
+TRho_Profile_title = 'TRho_Profile'
+
+TRho_Profile_xmin = -11.1
+TRho_Profile_xmax = 10.2
+TRho_Profile_ymin = 2.6
+TRho_Profile_ymax = 10.2
+
+show_TRho_Profile_kap_regions = .false.
+show_TRho_Profile_eos_regions = .false.
+show_TRho_Profile_gamma1_4_3rd = .false.
+show_TRho_Profile_degeneracy_line = .true.
+show_TRho_Profile_Pgas_Prad_line = .true.
+show_TRho_Profile_burn_lines = .true.
+show_TRho_Profile_burn_labels = .true.
+
+TRho_Profile_use_decorator = .true.
+
+! file output
+TRho_Profile_file_flag = .false.
+TRho_Profile_file_dir = 'Trho_plots'
+TRho_Profile_file_prefix = 'trho_profile_'
+TRho_Profile_file_interval = 5
+TRho_Profile_file_width = -1
+TRho_Profile_file_aspect_ratio = -1
+
+
+
 ! KIPPENHAHN DIAGRAM HISTORY PLOT (star_age)
 !-------------------------------------------------
 Kipp_win_flag = .false.
@@ -21,7 +61,7 @@ Kipp_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
 Kipp_title = 'Kipp'
 
 ! y-axis limits
-Kipp_mass_max = 1.8
+Kipp_mass_max = 2.5
 Kipp_mass_min = 0
 Kipp_show_mass_boundaries = .true.
 Kipp_show_mixing = .true.
@@ -40,7 +80,7 @@ Kipp_xaxis_in_seconds = .false.  ! Requires Kipp_xaxis_name = 'star_age'
 Kipp_xaxis_time_from_present = .false.  ! Requires Kipp_xaxis_name = 'star_age'
 
 ! file output
-Kipp_file_flag = .true.
+Kipp_file_flag = .false.
 Kipp_file_dir = 'Kipp_plots' ! Directory to save png images (Needs to exist!)
 Kipp_file_prefix = 'kipp_'
 Kipp_file_interval = 5
@@ -101,7 +141,7 @@ Abundance_xaxis_reversed = .false.
 
 ! x-axis limits
 Abundance_xmin = 0
-Abundance_xmax = 1.5
+Abundance_xmax = 2.5
 
 ! y-axis limits
 Abundance_log_mass_frac_min = -3
@@ -111,7 +151,7 @@ Abundance_log_mass_frac_max = 0.6
 Abundance_show_photosphere_location = .true.
 
 ! file output
-Abundance_file_flag = .true.
+Abundance_file_flag = .false.
 Abundance_file_dir = 'Abund_plots'
 Abundance_file_prefix = 'abund_'
 Abundance_file_interval = 5
@@ -139,7 +179,7 @@ Power_xaxis_name = 'mass'
 Power_xaxis_reversed = .false.
 
 ! file output
-Power_file_flag = .true.
+Power_file_flag = .false.
 Power_file_dir = 'Power_plots'
 Power_file_prefix = 'power_'
 Power_file_interval = 5
@@ -169,7 +209,7 @@ Mixing_xaxis_name = 'mass'
 Mixing_xaxis_reversed = .false.
 
 ! file output
-Mixing_file_flag = .true.
+Mixing_file_flag = .false.
 Mixing_file_dir = 'Mixing_plots'
 Mixing_file_prefix = 'mixing_'
 Mixing_file_interval = 5
@@ -271,7 +311,7 @@ Profile_Panels1_yaxis_name(3) = 'ye'
 Profile_Panels1_other_yaxis_name(3) = 'vel_km_per_s'
 
 ! file output
-Profile_Panels1_file_flag = .true.
+Profile_Panels1_file_flag = .false.
 Profile_Panels1_file_dir = 'Panels1'
 Profile_Panels1_file_prefix = 'profile_panels1_'
 Profile_Panels1_file_interval = 5
@@ -337,7 +377,7 @@ Profile_Panels2_yaxis_name(3) = 'net_nuclear_energy'
 Profile_Panels2_other_yaxis_name(3) = 'opacity'
 
 ! file output
-Profile_Panels2_file_flag = .true.
+Profile_Panels2_file_flag = .false.
 Profile_Panels2_file_dir = 'Panels2'
 Profile_Panels2_file_prefix = 'profile_panels2_'
 Profile_Panels2_file_interval = 5
@@ -557,7 +597,7 @@ Grid2_plot_pad_bot(5) = 0.0 ! fraction of full window height for padding at bott
 Grid2_txt_scale_factor(5) = 0.65 ! multiply txt_scale for subplot by this
 
 ! file output
-Grid2_file_flag = .true.
+Grid2_file_flag = .false.
 Grid2_file_dir = 'Grid2'
 Grid2_file_prefix = 'grid_'
 Grid2_file_interval = 10 ! 1 ! output when mod(model_number,Grid2_file_interval)==0

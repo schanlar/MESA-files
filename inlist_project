@@ -1,10 +1,14 @@
-! Inlist to evovle an 1.8 Msol Helius star, with solar metallicity, and overshoot mixing.
-
 &star_job
+  ! see star/defaults/star_job.defaults
+
+
 
 ! BASIC MODEL PARAMETERS -- I/O
 ! -------------------------------------------------------------------
+! -------------------------------------------------------------------
 
+  ! Begin with a pre-main sequence model
+    create_pre_main_sequence_model = .true.
 
     set_initial_age = .true.
     initial_age = 0
@@ -12,100 +16,144 @@
     set_initial_model_number = .true.
     initial_model_number = 0
 
-  ! display on-screen plots
+  ! Display on-screen plots
     pgstar_flag = .true.
+    pause_before_terminate = .true.
 
 
-  ! start at preMS and change composition
-    create_pre_main_sequence_model = .true.
+  ! or start at preMS and change composition
+    !create_pre_main_sequence_model = .true.
     set_uniform_initial_composition = .true.
-    initial_h1 = 0.d0
-    initial_h2 = 0.d0
-    initial_he3 = 0.d0
-    initial_he4 = 0.98
+    initial_h1 = 0.0d0
+    initial_h2 = 0.0d0
+    initial_he3 = 0.0d0
+    initial_he4 = 0.98d0
 
-  ! save model
+  ! Load a saved model
+    !load_saved_model = .false.
+    !saved_model_name = ''
+
+  ! Save a model at the end of the run
     save_model_when_terminate = .true.
-    save_model_filename = '/vol/hal/halraid/jantoniadis/HeCores/Condor/full_grid/1.8000_0.0200_0.0140/final_model.mod'
+    save_model_filename = '2p5M_final_new_mesa_version_test.mod'
 
     write_profile_when_terminate = .true.
-    filename_for_profile_when_terminate ='/vol/hal/halraid/jantoniadis/HeCores/Condor/full_grid/1.8000_0.0200_0.0140/final_profile.data'
+    filename_for_profile_when_terminate ='final_profile_new_mesa_version_test.data'
 
 
 
+ ! NUCLEAR REACTION NETWORK
+ ! -------------------------------------------------------------------
+ ! -------------------------------------------------------------------
 
-
-
-! EOS, NUCLEAR REACTION NETWORK, AND OPACITY
-! -------------------------------------------------------------------
-
-    eos_file_prefix = 'mesa'
+   ! For switching reaction networks.
+   ! change_net = .false.
     change_initial_net = .true.
-
-
     new_net_name = 'weak.net'  !NeNa, MgAl cycles + Urca
+
+
+   ! If this is true, use the A=17-28 weak reaction rates from
+   ! ::
+   !     Suzuki, Toki, and Nomoto (2016)
+   !     Electron-capture and $\beta$-decay rates for sd-shell nuclei in stellar environments relevant to high-density O-Ne-Mg cores
+
     use_suzuki_weak_rates = .true.
 
-    kappa_file_prefix = 'gs98'
+
+    ! PATH TO THE LOCAL rate_tables DIRECTORY
+    ! rate_tables_dir = '/vol/aibn1107/data2/schanlar/Thesis_work/singles/Urca/2.5M/rate_tables'
+
+
+    ! Rates preferences
+    ! + 1 = NACRE rates
+    ! + 2 = jina reaclib rates
+    ! ::
+
+    set_rates_preference = .true.
+    new_rates_preference = 2
+
+
+    ! Select which expression for the ion chemical potential to use
+    ! to calculate the energy shift associated with changing ion charge
 
     ion_coulomb_corrections = 'PCR2009'
+
+
+    ! Select which expression to use to calculate the shift in the
+    ! electron chemical potential at the location of the nucleus
+
     electron_coulomb_corrections = 'Itoh2002'
 
-    set_eos_PC_parameters = .true.
-    mass_fraction_limit_for_PC = 0d0
 
-    !move eos blend so the core is always on PC
-    log_Gamma_all_HELM = 0.60206d0 ! Gamma = 4
-    log_Gamma_all_PC = 0.90309d0 ! Gamma = 8
+/ ! end of star_job namelist
 
 
-/ !end of star_job namelist
+&eos
+  ! eos options
+  ! see eos/defaults/eos.defaults
+
+  ! Only consider isotopes in the EOS if their mass fraction is above this value.
+
+    !mass_fraction_limit_for_PC = 0d0
+
+  ! Move eos blend so the core is always on PC
+
+    !log_Gamma_e_all_HELM = 0.60206d0
+    !log_Gamma_e_all_PC = 0.90309d0 
+
+/ ! end of eos namelist
+
+
+&kap
+  ! kap options
+  ! see kap/defaults/kap.defaults
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+/ ! end of kap namelist
 
 
 &controls
+  ! see star/defaults/controls.defaults
 
-initial_mass = 1.8
-initial_z = 0.02
-initial_y = 0.98
+  ! OUTPUT CONTROLS
+  ! -------------------------------------------------------------------
+  ! -------------------------------------------------------------------
 
+    terminal_interval = 10000
+    write_header_frequency = 10
 
-
-
-
-! OUTPUT CONTROLS
-! -------------------------------------------------------------------
-
-
-
-terminal_interval = 10000
-write_header_frequency = 10
-log_directory = '/vol/hal/halraid/jantoniadis/HeCores/Condor/full_grid/1.8000_0.0200_0.0140/LOGS'
-photo_directory = '/vol/hal/halraid/jantoniadis/HeCores/Condor/full_grid/1.8000_0.0200_0.0140/photos'
-
-
-
-   ! high center T limit to avoid negative mass fractions
-         sig_min_factor_for_high_Tcenter = 0.01
-          ! inactive when >= 1d0
-            ! if Tcenter >= Tcenter_min_for_sig_min_factor_full_on,
-            ! then okay to reduce sig by as much as this factor
-            ! as needed to prevent causing negative abundances
-         Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-            ! if Tcenter >= this, factor = sig_min_factor_for_neg_abundances
-            ! this should be > Tcenter_max_for_sig_min_factor_full_off.
-         Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-            ! if Tcenter <= this, factor = 1, so has no effect
-            ! this should be < Tcenter_min_for_sig_min_factor_full_on.
-         ! for T > full_off and < full_on, factor changes linearly with Tcenter
-
-         velocity_logT_lower_bound = 8
-         max_dt_yrs_for_velocity_logT_lower_bound = 0.1
+   ! log_directory = 'LOGS'
+   ! photo_directory = 'photos'
 
 
 
 
-! MIXING AND CONVECTION PARAMETERS
-! ----------------------------------------------------------------------------------------
+  ! Starting specifications
+    initial_mass = 2.5d0 ! in Msun units
+    initial_z = 0.02d0
+    initial_y = 0.98d0
+
+
+  ! Local override for global ``v_flag``.
+  ! If local logT < this bound, local ``v_flag`` is set false,
+  ! else local ``v_flag`` is set to global ``v_flag``.
+  ! this lets you force v = 0 in outer envelope.
+  ! ::
+
+    velocity_logT_lower_bound = 8 ! -1d99
+
+
+  ! Only apply ``velocity_logT_lower_bound`` when timestep < this limit.
+  ! ::
+
+    max_dt_yrs_for_velocity_logT_lower_bound = 0.1 ! 1d99
+
+
+  ! MIXING AND CONVECTION PARAMETERS
+  ! -------------------------------------------------------------------
+  ! -------------------------------------------------------------------
+
     MLT_option = 'Henyey'
     use_ledoux_criterion = .true.
     mixing_length_alpha = 2.0
@@ -114,151 +162,160 @@ photo_directory = '/vol/hal/halraid/jantoniadis/HeCores/Condor/full_grid/1.8000_
     thermohaline_option = 'Brown_Garaud_Stellmach_13'
 
 
-    use_Type2_opacities = .true.
-    Zbase = 0.02
+   ! Fixing the position of the Lagrangian region of the mesh helps
+   ! convergence near the Eddington limit
 
-    ! Fixing the position of the Lagrangian region of the mesh helps
-    ! convergence near the Eddington limit
+   ! Move ``k_below_const_q`` inward from surface until ``q(k) <= max_q``.
+   ! Then continue moving inward until reach ``logT(k) >= max_logT`` or ``q(k) <= min_q``.
+   ! ::
 
     max_logT_for_k_below_const_q = 100
     max_q_for_k_below_const_q = 0.995
     min_q_for_k_below_const_q = 0.995
+
+
+   ! Move ``k_const_mass`` inward from ``k_below_const_q+1`` until ``q(k) <= max_q``.
+   ! Then continue moving inward until reach ``logT(k) >= max_logT`` or ``q(k) <= min_q``.
+   ! ::
+
     max_logT_for_k_const_mass = 100
     max_q_for_k_const_mass = 0.99
     min_q_for_k_const_mass = 0.99
 
 
+   ! MASS LOSS PARAMETERS
+   ! -------------------------------------------------------------------
+   ! -------------------------------------------------------------------
 
-      overshoot_f_above_nonburn_core = 0.014
-      overshoot_f_above_nonburn_shell = 0.014
-      overshoot_f_below_nonburn_shell = 0.014
-      overshoot_f_above_burn_h_core = 0.014
-      overshoot_f_above_burn_h_shell = 0.014
-      overshoot_f_below_burn_h_shell = 0.014
-      overshoot_f_above_burn_he_core = 0.014
-      overshoot_f_above_burn_he_shell = 0.014
-      overshoot_f_below_burn_he_shell = 0.014
-      overshoot_f_above_burn_z_core = 0.014
-      overshoot_f_above_burn_z_shell = 0.014
-      overshoot_f_below_burn_z_shell = 0.014
-
-      overshoot_f0_above_nonburn_core = 0.004
-      overshoot_f0_above_nonburn_shell = 0.004
-      overshoot_f0_below_nonburn_shell = 0.004
-      overshoot_f0_above_burn_h_core = 0.004
-      overshoot_f0_above_burn_h_shell = 0.004
-      overshoot_f0_below_burn_h_shell = 0.004
-      overshoot_f0_above_burn_he_core = 0.004
-      overshoot_f0_above_burn_he_shell = 0.004
-      overshoot_f0_below_burn_he_shell = 0.004
-      overshoot_f0_above_burn_z_core = 0.004
-      overshoot_f0_above_burn_z_shell = 0.004
-      overshoot_f0_below_burn_z_shell = 0.004
-
-      overshoot_below_noburn_shell_factor = 10
-
-      D_mix_ov_limit = 1d2
-
-
-
-
-
-
-! MASS LOSS PARAMETERS
-! ------------------------------------------------------------------------------------------
     cool_wind_RGB_scheme = 'Dutch'
     cool_wind_AGB_scheme = 'Dutch'
-    Dutch_scaling_factor = 1 ! 1.58 for enhanced loss (Yoon2017)
+    Dutch_scaling_factor = 1 
     RGB_to_AGB_wind_switch = 1d-4
 
-    cool_wind_full_on_T = 1d10  !K
-    hot_wind_full_on_T = 1.1d10 !K
+    cool_wind_full_on_T = 1d10  
+    hot_wind_full_on_T = 1.1d10 
 
-    !mass_change_full_on_dt = 1d+07
-    !mass_change_full_off_dt = 1d+06
+   ! These params provide the option to turn off mass change when have very small timesteps.
+   ! Between ``mass_change_full_on_dt`` and ``mass_change_full_off_dt`` mass change is gradually reduced.
+   ! Units in seconds.
+   ! ::
 
-    mesh_Pgas_div_P_exponent = 0.25
+   ! mass_change_full_on_dt = 1d+07
+   ! mass_change_full_off_dt = 1d+06
 
-    ! MLT++
+
+   ! Multiply ``mesh_delta_coeff`` by (Pgas/Ptotal) to this power.
+
+    !mesh_Pgas_div_P_exponent = 0.25 ! default = 0
+
+
+
+   ! This is the treatment of convection, referred to as MLT++
+   ! in Section 7.2 of Paxton et al. (2013), that reduces the
+   ! superadiabaticity in some radiation-dominated convective regions.
+
     okay_to_reduce_gradT_excess = .true.
 
-            gradT_excess_f1 = 1d-4
-            gradT_excess_f2 = 1d-2 !1d-3
-            gradT_excess_age_fraction = 0.9d0
+    gradT_excess_f1 = 1d-4
+    gradT_excess_f2 = 1d-2 ! default = 1d-3
+    gradT_excess_age_fraction = 0.9d0
 
-            gradT_excess_lambda1 = 1.0
-            gradT_excess_beta1 = 0.35
+    gradT_excess_lambda1 = 1.0d0
+    gradT_excess_beta1 = 0.35d0
 
-            gradT_excess_lambda2 = 0.5
-            gradT_excess_beta2 = 0.25
+    gradT_excess_lambda2 = 0.5d0
+    gradT_excess_beta2 = 0.25d0
 
-            gradT_excess_dlambda = 0.1
-            gradT_excess_dbeta = 0.1
-
-
-
-   screening_mode = 'extended'
+    gradT_excess_dlambda = 0.1d0
+    gradT_excess_dbeta = 0.1d0
 
 
 
+    screening_mode = 'extended' ! MESA versions <=11435 used ``extended'' as the default value. Now, the default value is ``chugunov''
 
 
-   dX_nuc_drop_limit = 5d-2
-   dX_nuc_drop_limit_at_high_T = 5d-3 ! for center logT > 9.45
 
-   delta_lgL_He_limit = 0.1 ! limit for magnitude of change in lgL_He
+    dX_nuc_drop_limit_at_high_T = 5d-3 ! default = -1
+    delta_lgL_He_limit = 0.1d0 ! default = 0.025d0
 
-         dX_nuc_drop_max_A_limit = 52
-         dX_nuc_drop_min_X_limit = 1d-4
-         dX_nuc_drop_hard_limit = 1d99
-
-         delta_lgTeff_limit = 0.5
-         delta_lgL_limit = 0.5
-         delta_lgRho_cntr_limit = 0.02
-
-         T_mix_limit = 0
+    delta_lgTeff_limit = 0.5d0 ! default = 0.01d0
+    delta_lgL_limit = 0.5d0 ! default = 0.1d0
+    delta_lgRho_cntr_limit = 0.02d0 ! default = 0.05d0
 
 
-    ! these are to properly resolve core helium depletion
+
+   ! Try other parameters
+   ! #########################################
+    use_gold_tolerances = .false.
+
+   ! important for off-centre ignition -- see documentation
+    !T_function1_weight = 1 
+
+
+    !Pextra_factor = -1
+
+
+    !tol_residual_norm1 = 1d-2
+    !tol_max_residual1 = 1d-2
+
+
+    !min_xa_hard_limit = -1d-8
+    !min_xa_hard_limit_for_highT = -3d-8
+
+    !sum_xa_hard_limit = 5d-2
+    !sum_xa_hard_limit_for_highT = 1d-1
+   ! #########################################
+
+
+
+
+
+
+   ! These are to properly resolve core helium depletion
+
     delta_lg_XHe_cntr_limit = 0.02d0
     delta_lg_XHe_cntr_max = 0.0d0
     delta_lg_XHe_cntr_min = -6.0d0
     delta_lg_XHe_cntr_hard_limit = 0.03d0
-    ! these are to properly resolve core carbon depletion
+
+
+   ! These are to properly resolve core carbon depletion
+
     delta_lg_XC_cntr_limit = 0.01d0
     delta_lg_XC_cntr_max = 0.0d0
     delta_lg_XC_cntr_min = -5.0d0
     delta_lg_XC_cntr_hard_limit = 0.02d0
-    ! this is mainly to resolve properly when the star goes off the main sequence
+
+
+   ! This is mainly to resolve properly when the star goes off the main sequence
+
     delta_HR_limit = 0.005d0
-    ! relax default dHe/He, otherwise growing He core can cause things to go at a snail pace
+
+
+   ! Relax default dHe/He, otherwise growing He core can cause things to go at a snail pace
+
     dHe_div_He_limit = 2.0
 
 
 
+   ! GRID AND TIMESTEP RESOLUTION
+   ! -------------------------------------------------------------------
+   ! -------------------------------------------------------------------
 
-! GRID AND TIMESTEP RESOLUTION
-! ---------------------------------------------------------------------------------------------
 
-  ! extra spatial resolution: 0.5, 0.8
-   mesh_delta_coeff = 1.0 ! 3.5 for late stages
-   !mesh_delta_coeff_for_highT = 0.5
+   ! Spatial resolution
+ 
+    mesh_delta_coeff = 1.0d0 
+    mesh_delta_coeff_for_highT = 3.0d0
 
-  ! temporal resolution
-   varcontrol_target = 1d-3 ! 1d-1, 1d-2, 1d-3, 1d-4
+   ! Temporal resolution
 
-   newton_itermin = 2
+    varcontrol_target = 1d-3
 
-   tol_correction_norm_alt = 0.001
-   tol_max_correction_alt = 1
+    min_timestep_limit = 1d-99 ! (seconds)
 
-   !tol_residual_norm1 = 1d-5
-   !tol_max_residual1 = 1d-4
+    max_model_number = 60000
 
-   max_backups_in_a_row = 30
-   max_number_retries = -1
-   min_timestep_limit = 1d-99 ! (seconds)
-
- max_model_number = 60000
+  
 
 / ! end of controls namelist
